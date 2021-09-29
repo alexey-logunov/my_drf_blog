@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import viewsets, filters
 from .serializers import PostSerializer, TagSerializer, ContactSerailizer
 from .models import Post
 from rest_framework.response import Response
@@ -8,17 +8,20 @@ from rest_framework.views import APIView
 from django.core.mail import send_mail
 
 
-class PostViewSet(viewsets.ModelViewSet):
-    serializer_class = PostSerializer
-    queryset = Post.objects.all()
-    lookup_field = 'slug'
-    permission_classes = [permissions.AllowAny]
-
-
 class PageNumberSetPagination(pagination.PageNumberPagination):
     page_size = 6
     page_size_query_param = 'page_size'
     ordering = 'created_at'
+
+
+class PostViewSet(viewsets.ModelViewSet):
+    search_fields = ['content', 'h1']
+    filter_backends = (filters.SearchFilter,)
+    serializer_class = PostSerializer
+    queryset = Post.objects.all()
+    lookup_field = 'slug'
+    permission_classes = [permissions.AllowAny]
+    pagination_class = PageNumberSetPagination
 
 
 class PostViewSet(viewsets.ModelViewSet):
